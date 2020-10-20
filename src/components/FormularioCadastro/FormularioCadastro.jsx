@@ -1,89 +1,44 @@
-import React, { useState } from 'react';
-import PropTypes from 'prop-types';
-import {
-    Button, TextField, FormControlLabel, Switch,
-} from '@material-ui/core';
+import React, { Fragment, useEffect, useState } from 'react';
+import { Typography, Stepper, Step, StepLabel } from '@material-ui/core';
+import DadosEntrega from './DadosEntrega';
+import DadosPessoais from './DadosPessoais';
+import DadosUsuario from './DadosUsuario';
 
-function FormularioCadastro({ aoEnviar, validarCpf }) {
-    const [nome, setNome] = useState('');
-    const [sobrenome, setSobrenome] = useState('');
-    const [cpf, setCpf] = useState('');
-    const [promocoes, setPromocoes] = useState(true);
-    const [novidades, setNovidades] = useState(true);
-    const [erros, setErros] = useState({ cpf: { invalido: false, texto: '' } });
+function FormularioCadastro({ aoEnviar, validacoes }) {
 
-    return (
-        <form onSubmit={(event) => {
-            event.preventDefault();
-            aoEnviar({
-                nome, sobrenome, cpf, novidades, promocoes,
-            });
-        }}
-        >
-            <TextField
-                id="nome"
-                label="Nome"
-                value={nome}
-                variant="outlined"
-                margin="normal"
-                fullWidth
-                onChange={(event) => { setNome(event.target.value); }}
-            />
-            <TextField
-                id="sobrenome"
-                label="Sobrenome"
-                value={sobrenome}
-                variant="outlined"
-                margin="normal"
-                fullWidth
-                onChange={(event) => { setSobrenome(event.target.value); }}
-            />
-            <TextField
-                id="cpf"
-                label="CPF"
-                value={cpf}
-                variant="outlined"
-                margin="normal"
-                fullWidth
-                onChange={(event) => { setCpf(event.target.value); }}
-                onBlur={(event) => {
-                    setErros(validarCpf(event.target.value));
-                }}
-                error={erros.cpf.invalido}
-                helperText={erros.cpf.texto}
-            />
+    const [etapaAtual, setEtapaAtual] = useState(0);
+    const [dadosColetados, setDados] = useState({});
+    useEffect(() => {
+        if (etapaAtual === formularios.length ) { aoEnviar(dadosColetados) };
+    })
 
-            <FormControlLabel
-                control={(
-                    <Switch
-                        checked={promocoes}
-                        name="promocoes"
-                        color="primary"
-                        onChange={(event) => { setPromocoes(event.target.checked); }}
-                    />
-                )}
-                label="Promoções"
-            />
-            <FormControlLabel
-                control={(
-                    <Switch
-                        checked={novidades}
-                        name="novidades"
-                        color="primary"
-                        onChange={(event) => { setNovidades(event.target.checked); }}
-                    />
-                )}
-                label="Novidades"
-            />
+    const formularios = [
+        <DadosUsuario aoEnviar={coletarDados} validacoes={validacoes} />,
+        <DadosPessoais aoEnviar={coletarDados} validacoes={validacoes} />,
+        <DadosEntrega aoEnviar={coletarDados} validacoes={validacoes} />,
+        <Typography variant="h5">Obrigado por se cadastrar!</Typography>
+    ]
 
-            <Button color="primary" variant="contained" type="submit" disabled={erros.cpf.invalido}>Cadastrar</Button>
-        </form>
-    );
+    function coletarDados(dados){
+        setDados({...dadosColetados, ...dados});
+        proximo();
+    }
+
+    function proximo(){
+        setEtapaAtual(etapaAtual + 1);
+    }
+
+    return(
+        <Fragment>
+            <Stepper activeStep={etapaAtual}>
+                <Step><StepLabel>Login</StepLabel></Step>
+                <Step><StepLabel>Pessoal</StepLabel></Step>
+                <Step><StepLabel>Entrega</StepLabel></Step>
+                <Step><StepLabel>Finalização</StepLabel></Step>
+            </Stepper>
+            {formularios[etapaAtual]}
+        </Fragment>
+    )
 }
-
-FormularioCadastro.propTypes = {
-    aoEnviar: PropTypes.func.isRequired,
-    validarCpf: PropTypes.object.isRequired,
-};
 
 export default FormularioCadastro;
