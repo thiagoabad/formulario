@@ -27,11 +27,19 @@ function validarCpf(cpf) {
 }
 
 function validarSenha(senha) {
-    if (senha.length < 4 || senha.length > 72 ) {
-        return { invalido: true, texto: 'Senha deve ter entre 4 e 72 dígitos' };
+    if (senha.length < 8 || senha.length > 72 ) {
+        return { invalido: true, texto: 'Senha deve ter entre 8 e 72 dígitos' };
     } else {
         return { invalido: false, texto: '' };
     }
 }
 
-export {validarCpf, validarSenha};
+function validarCep(cep) {
+    if (cep.length !== 8 ) {
+        return { invalido: true, texto: 'O CEP deve ter 8 dígitos' };
+    } else {
+        return { invalido: false, texto: '' };
+    }
+}
+
+export {validarCpf, validarSenha, validarCep};

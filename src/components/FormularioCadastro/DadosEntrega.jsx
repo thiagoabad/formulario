@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { TextField, Button } from '@material-ui/core';
+import ValidacoesCadastro from '../../context/ValidacoesCadastro';
 
 function DadosEntrega({ aoEnviar }) {
 
@@ -8,13 +9,34 @@ function DadosEntrega({ aoEnviar }) {
     const [numero, setNumero] = useState(0);
     const [cidade, setCidade] = useState('');
     const [estado, setEstado] = useState('');
+    const [erros, setErros] = useState({ cep: { invalido: false, texto: '' } });
+
+    const validacoes = useContext(ValidacoesCadastro);
+
+    function validarCampos(event){
+        const {name, value} = event.target;
+        const novoEstado = {...erros};
+        novoEstado[name] = validacoes[name](value);
+        setErros(novoEstado);
+    }
+
+    function possoEnviar(){
+        for (let campo in erros){
+            if (erros[campo].invalido){
+                return false;
+            }
+        }
+        return true;
+    }
 
     return (
         <form onSubmit={(event) => {
             event.preventDefault();
-            aoEnviar({
-                cep, endereco, numero, cidade, estado,
-            });
+            if (possoEnviar()){
+                aoEnviar({
+                    cep, endereco, numero, cidade, estado,
+                });
+            }
         }}
         >
             <TextField
@@ -25,6 +47,9 @@ function DadosEntrega({ aoEnviar }) {
                 variant="outlined"
                 margin="normal"
                 onChange={(event) => { setCep(event.target.value); }}
+                onBlur={validarCampos}
+                error={erros.cep.invalido}
+                helperText={erros.cep.texto}
             />
             <TextField
                 id="endereco"
