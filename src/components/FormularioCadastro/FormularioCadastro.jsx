@@ -8,8 +8,9 @@ function FormularioCadastro({ aoEnviar, validacoes }) {
 
     const [etapaAtual, setEtapaAtual] = useState(0);
     const [dadosColetados, setDados] = useState({});
+    
     useEffect(() => {
-        if (etapaAtual === formularios.length ) { aoEnviar(dadosColetados) };
+        if (etapaAtual === formularios.length - 1) { aoEnviar(dadosColetados) };
     })
 
     const formularios = [
